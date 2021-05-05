@@ -46,6 +46,7 @@ setup(
     packages=find_packages(exclude=['docs', 'tests']),
     entry_points={
         'console_scripts': [
+            "ariadne = ariadne.main:main"
             # 'command = some.module:some_function',
         ],
     },
