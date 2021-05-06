@@ -25,7 +25,10 @@ from qtpy.QtWidgets import (
     QComboBox,
     QLabel,
     QTabWidget,
+    QSplitter,
+    QFrame,
 )
+from qtpy.QtCore import Qt
 
 from .models import SearchAndView
 
@@ -173,9 +176,70 @@ class QtRunExperiment(QWidget):
         vbox2.addStretch(stretch=1)
         hbox.addLayout(vbox2)
 
-
         vbox.addLayout(hbox)
         self.setLayout(vbox)
+
+
+class QtOrganizeQueueRight(QSplitter):
+    def __init__(self, model, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.model = model
+
+        self.setOrientation(Qt.Vertical)
+
+        self._frame_top = QFrame(self)
+        self._frame_top.setFrameShape(QFrame.StyledPanel)
+
+        self._frame_bottom = QFrame(self)
+        self._frame_bottom.setFrameShape(QFrame.StyledPanel)
+
+        self.addWidget(self._frame_top)
+        self.addWidget(self._frame_bottom)
+
+        self._plan_editor = QtRePlanEditor(model)
+        self._plan_history = QtRePlanHistory(model)
+
+        vbox = QVBoxLayout()
+        vbox.addWidget(self._plan_editor, stretch=1)
+        self._frame_top.setLayout(vbox)
+
+        vbox = QVBoxLayout()
+        vbox.addWidget(self._plan_history, stretch=1)
+        self._frame_bottom.setLayout(vbox)
+
+        h = self.sizeHint().height()
+        self.setSizes([h, h])
+
+
+class QtOrganizeQueueSplitter(QSplitter):
+    def __init__(self, model, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.model = model
+
+        self.setOrientation(Qt.Horizontal)
+
+        self._frame_left = QFrame(self)
+        self._frame_left.setFrameShape(QFrame.StyledPanel)
+
+        self._frame_right = QFrame(self)
+        self._frame_right.setFrameShape(QFrame.StyledPanel)
+
+        self.addWidget(self._frame_left)
+        self.addWidget(self._frame_right)
+
+        self._plan_editor = QtRePlanQueue(model)
+        self._right_splitter = QtOrganizeQueueRight(model)
+
+        vbox = QVBoxLayout()
+        vbox.addWidget(self._plan_editor, stretch=1)
+        self._frame_left.setLayout(vbox)
+
+        vbox = QVBoxLayout()
+        vbox.addWidget(self._right_splitter, stretch=1)
+        self._frame_right.setLayout(vbox)
+
+        w = self.sizeHint().width()
+        self.setSizes([w, w])
 
 
 class QtOrganizeQueue(QWidget):
@@ -184,14 +248,7 @@ class QtOrganizeQueue(QWidget):
         self.model = model
 
         hbox = QHBoxLayout()
-        vbox1 = QVBoxLayout()
-        vbox1.addWidget(QtRePlanQueue(model), stretch=1)
-        hbox.addLayout(vbox1)
-        vbox2 = QVBoxLayout()
-        vbox2.addWidget(QtRePlanEditor(model), stretch=1)
-        vbox2.addWidget(QtRePlanHistory(model), stretch=1)
-        hbox.addLayout(vbox2)
-
+        hbox.addWidget(QtOrganizeQueueSplitter(model))
         self.setLayout(hbox)
 
 
