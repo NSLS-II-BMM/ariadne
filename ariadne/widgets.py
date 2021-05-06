@@ -147,7 +147,7 @@ class QtSearchAndView(QWidget):
         layout.addLayout(plot_layout)
 
 
-class QtRunEngineManager(QWidget):
+class QtRunExperiment(QWidget):
     def __init__(self, model, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.model = model
@@ -163,16 +163,36 @@ class QtRunEngineManager(QWidget):
         vbox.addLayout(hbox)
 
         hbox = QHBoxLayout()
+
         vbox1 = QVBoxLayout()
-        vbox1.addWidget(QtRePlanEditor(model), stretch=1)
+        vbox1.addWidget(QtReRunningPlan(model), stretch=1)
+        vbox1.addWidget(QtRePlanQueue(model), stretch=2)
+        hbox.addLayout(vbox1)
+        vbox2 = QVBoxLayout()
+        vbox2.addWidget(QtRePlanEditor(model), stretch=1)
+        vbox2.addStretch(stretch=1)
+        hbox.addLayout(vbox2)
+
+
+        vbox.addLayout(hbox)
+        self.setLayout(vbox)
+
+
+class QtOrganizeQueue(QWidget):
+    def __init__(self, model, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.model = model
+
+        hbox = QHBoxLayout()
+        vbox1 = QVBoxLayout()
         vbox1.addWidget(QtRePlanQueue(model), stretch=1)
         hbox.addLayout(vbox1)
         vbox2 = QVBoxLayout()
-        vbox2.addWidget(QtReRunningPlan(model), stretch=1)
-        vbox2.addWidget(QtRePlanHistory(model), stretch=2)
+        vbox2.addWidget(QtRePlanEditor(model), stretch=1)
+        vbox2.addWidget(QtRePlanHistory(model), stretch=1)
         hbox.addLayout(vbox2)
-        vbox.addLayout(hbox)
-        self.setLayout(vbox)
+
+        self.setLayout(hbox)
 
 
 class QtViewer(QTabWidget):
@@ -182,10 +202,11 @@ class QtViewer(QTabWidget):
 
         self.setTabPosition(QTabWidget.West)
 
-        self._re_manager = QtRunEngineManager(model.run_engine)
-        # TODO: putting the widget in QScrollArea doesn't work (the widget is not scaled with the window)
-        #   It can be a configuration problem.
-        self.addTab(self._re_manager, "Run Engine")
+        self._run_experiment = QtRunExperiment(model.run_engine)
+        self.addTab(self._run_experiment, "Run Experiment")
+
+        self._organize_queue = QtOrganizeQueue(model.run_engine)
+        self.addTab(self._organize_queue, "Organize Queue")
 
         self._search_and_view = QtSearchAndView(SearchAndView(model.search, model.auto_plot_builder))
         self.addTab(self._search_and_view, "Data Broker")
