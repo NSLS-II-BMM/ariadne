@@ -345,7 +345,7 @@ class PlanEditorXafs(QWidget):
             "start_next": True,
             "start_number": 1,
             "mode": "transmission",
-            "bounds_wavenumbers": True,
+            "bounds_wavenumbers": False,
             "bounds": [-200, -30, -10, 30, 200],
             "steps": [10, 2, 0.2, 0.5],
             "times": [1, 1, 1, 1],
@@ -559,8 +559,8 @@ class PlanEditorXafs(QWidget):
             self._rb_start_number.setEnabled(edit_mode)
             self._le_start.setReadOnly(not edit_mode)
 
-            self._rb_units_wavenumber.setEnabled(edit_mode)
-            self._rb_units_energy.setEnabled(False)  # Change this when the feature is ready
+            self._rb_units_wavenumber.setEnabled(False)
+            self._rb_units_energy.setEnabled(edit_mode)  # Change this when the feature is ready
 
             self._pb_split.setEnabled(edit_mode and region_selected)
             self._pb_delete.setEnabled(edit_mode and region_selected and more_than_one_region)
