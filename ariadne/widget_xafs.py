@@ -934,6 +934,14 @@ class PlanEditorXafs(QWidget):
         kwargs["steps"] = steps
         kwargs["times"] = " ".join([f"{_}" for _ in parameters["times"]])
 
+        # The following parameters we don't set in the form, but they are needed for the plan to run.
+        if "snapshots" not in kwargs:
+            kwargs["snapshots"] = False
+        if "htmlpage" not in kwargs:
+            kwargs["htmlpage"] = False
+        if "lims" not in kwargs:
+            kwargs["lims"] = False
+
         item.update({"item_type": "plan", "name": "xafs", "args": [], "kwargs": kwargs})
         return item
 
