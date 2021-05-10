@@ -341,7 +341,7 @@ class PlanEditorXafs(QWidget):
             "sample": "--sample--",
             "preparation": "--preparation--",
             "comment": "--comment--",
-            "nscans": "3",
+            "nscans": "1",
             "start_next": True,
             "start_number": 1,
             "mode": "transmission",
@@ -487,10 +487,13 @@ class PlanEditorXafs(QWidget):
         self._ignore_table_events = False
 
     def _update_widget_state(self):
+        is_connected = bool(self.model.re_manager_connected)
+
         if self._plan_empty:
             self._lb_mode.setVisible(False)
             self._pb_edit.setVisible(False)
             self._pb_new.setVisible(True)
+            self._pb_new.setEnabled(is_connected)
 
             self._combo_element.setEnabled(False)
             self._combo_edge.setEnabled(False)
@@ -519,7 +522,6 @@ class PlanEditorXafs(QWidget):
             self._pb_reset.setEnabled(False)
 
         else:
-            is_connected = bool(self.model.re_manager_connected)
             region_selected = self._n_selected_region >= 0
             more_than_one_region = len(self._parameters["steps"]) > 1
             plan_valid = self._plan_valid
@@ -537,8 +539,8 @@ class PlanEditorXafs(QWidget):
                 self._pb_edit.setVisible(True)
                 self._pb_new.setVisible(True)
 
-            # self._pb_edit.setEnabled(not edit_mode)
-            # self._pb_new.setEnabled(not edit_mode)
+            self._pb_edit.setEnabled(is_connected)
+            self._pb_new.setEnabled(is_connected)
 
             self._combo_element.setEnabled(edit_mode)
             self._combo_edge.setEnabled(edit_mode)
@@ -789,9 +791,23 @@ class PlanEditorXafs(QWidget):
         return table_valid
 
     def _validate_widgets(self):
-        # Additional checks may be added in the future
-        table_valid = self._validate_table()
-        self._plan_valid = table_valid
+        is_valid = self._validate_table()
+
+        if self._combo_element.currentIndex() < 0:
+            is_valid = False
+        if self._combo_edge.currentIndex() < 0:
+            is_valid = False
+        if self._combo_mode.currentIndex() < 0:
+            is_valid = False
+
+        try:
+            int(self._le_number_of_scans)
+            if self._rb_start_number.isChecked():
+                int(self._le_start)
+        except Exception:
+            is_valid = False
+
+        self._plan_valid = is_valid
         self._update_widget_state()
 
     def _pb_edit_clicked(self):
@@ -893,22 +909,6 @@ class PlanEditorXafs(QWidget):
         return parameters
 
     def _parameters_to_item(self, parameters, *, item_original=None):
-        # default_parameters = {
-        #     "element": "Fe",
-        #     "edge": "K",
-        #     "sample": "--sample--",
-        #     "preparation": "--preparation--",
-        #     "comment": "--comment--",
-        #     "nscans": "3",
-        #     "start_next": True,
-        #     "start_number": 1,
-        #     "mode": "transmission",
-        #     "bounds_wavenumbers": True,
-        #     "bounds": [-200, -30, -10, 30, 200],
-        #     "steps": [10, 2, 0.2, 0.5],
-        #     "times": [1, 1, 1, 1],
-        # }
-
         if item_original is None:
             item = {}
             kwargs = {}
