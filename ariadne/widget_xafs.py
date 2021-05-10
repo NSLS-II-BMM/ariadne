@@ -128,6 +128,7 @@ class LineEditReadOnly(LineEditExtended):
 
 class PlanEditorXafs(QWidget):
 
+    signal_update_widgets = Signal()
     signal_update_selection = Signal(int)
 
     def __init__(self, model, parent=None, *, editable=False, detailed=True):
@@ -314,6 +315,9 @@ class PlanEditorXafs(QWidget):
         self.setLayout(vbox)
 
         self._update_widgets()
+
+        self.model.events.status_changed.connect(self.on_update_widgets)
+        self.signal_update_widgets.connect(self.slot_update_widgets)
 
         self.model.events.queue_item_selection_changed.connect(self.on_queue_item_selection_changed)
         self.signal_update_selection.connect(self.slot_view_item)
@@ -515,6 +519,7 @@ class PlanEditorXafs(QWidget):
             self._pb_reset.setEnabled(False)
 
         else:
+            is_connected = bool(self.model.re_manager_connected)
             region_selected = self._n_selected_region >= 0
             more_than_one_region = len(self._parameters["steps"]) > 1
             plan_valid = self._plan_valid
@@ -561,8 +566,8 @@ class PlanEditorXafs(QWidget):
             self._table.setEnabled(True)
             self._set_table_read_only(not edit_mode)
 
-            self._pb_save.setEnabled(edit_mode and plan_valid and not plan_new)
-            self._pb_add_to_queue.setEnabled(edit_mode and plan_valid)
+            self._pb_save.setEnabled(is_connected and edit_mode and plan_valid and not plan_new)
+            self._pb_add_to_queue.setEnabled(is_connected and edit_mode and plan_valid)
             self._pb_cancel.setEnabled(edit_mode)
             self._pb_reset.setEnabled(edit_mode)
 
@@ -959,3 +964,10 @@ class PlanEditorXafs(QWidget):
             self._edit_mode = False
             self._plan_new = False
             self._update_widgets()
+
+    def on_update_widgets(self, event):
+        self.signal_update_widgets.emit()
+
+    @Slot()
+    def slot_update_widgets(self):
+        self._update_widget_state()
