@@ -31,6 +31,7 @@ from qtpy.QtWidgets import (
 from qtpy.QtCore import Qt
 
 from .models import SearchAndView
+from .widget_xafs import PlanEditorXafs
 
 
 class QtSearchWithButton(QWidget):
@@ -173,7 +174,7 @@ class QtRunExperiment(QWidget):
         hbox.addLayout(vbox1)
         vbox2 = QVBoxLayout()
         vbox2.addWidget(QtRePlanEditor(model), stretch=1)
-        vbox2.addStretch(stretch=1)
+        vbox2.addWidget(PlanEditorXafs(model), stretch=1)
         hbox.addLayout(vbox2)
 
         vbox.addLayout(hbox)
