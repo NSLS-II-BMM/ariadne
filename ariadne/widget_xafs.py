@@ -349,6 +349,7 @@ class PlanEditorXafs(QWidget):
             "bounds": [-200, -30, -10, 30, 200],
             "steps": [10, 2, 0.2, 0.5],
             "times": [1, 1, 1, 1],
+            # "filename": "",
         }
         return copy.deepcopy(default_parameters)
 
@@ -801,7 +802,7 @@ class PlanEditorXafs(QWidget):
             is_valid = False
 
         try:
-            int(self._le_number_of_scans)
+            int(self._le_number_of_scans.text())
             if self._rb_start_number.isChecked():
                 int(self._le_start)
         except Exception:
