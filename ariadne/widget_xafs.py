@@ -1,5 +1,6 @@
 import copy
 import xraylib
+import re
 
 from qtpy.QtWidgets import (
     QWidget,
@@ -188,6 +189,10 @@ class PlanEditorXafs(QWidget):
         self._le_number_of_scans.textChanged.connect(self._le_number_of_scans_text_changed)
         self._le_number_of_scans.editingFinished.connect(self._le_number_of_scans_editing_finished)
 
+        self._le_filename = LineEditReadOnly()
+        self._le_filename.textChanged.connect(self._le_filename_text_changed)
+        self._le_filename.editingFinished.connect(self._le_filename_editing_finished)
+
         self._le_start = LineEditReadOnly()
         self._le_start.textChanged.connect(self._le_start_text_changed)
         self._le_start.editingFinished.connect(self._le_start_editing_finished)
@@ -199,14 +204,6 @@ class PlanEditorXafs(QWidget):
         self._bgroup_start = QButtonGroup()
         self._bgroup_start.addButton(self._rb_start_next)
         self._bgroup_start.addButton(self._rb_start_number)
-
-        self._rb_units_wavenumber = QRadioButton("Wavenumber")
-        self._rb_units_wavenumber.clicked.connect(self._rb_units_wavenumber_clicked)
-        self._rb_units_energy = QRadioButton("Energy")
-        self._rb_units_energy.clicked.connect(self._rb_units_energy_clicked)
-        self._bgroup_units = QButtonGroup()
-        self._bgroup_units.addButton(self._rb_units_wavenumber)
-        self._bgroup_units.addButton(self._rb_units_energy)
 
         self._pb_split = QPushButton("Split Region")
         self._pb_split.clicked.connect(self._pb_split_clicked)
@@ -294,9 +291,8 @@ class PlanEditorXafs(QWidget):
         vbox.addLayout(hbox)
 
         hbox = QHBoxLayout()
-        hbox.addWidget(QLabel("Bounds:"))
-        hbox.addWidget(self._rb_units_wavenumber)
-        hbox.addWidget(self._rb_units_energy)
+        hbox.addWidget(QLabel("File name:"))
+        hbox.addWidget(self._le_filename)
         hbox.addStretch(1)
         hbox.addWidget(self._pb_split)
         hbox.addWidget(self._pb_delete)
@@ -345,11 +341,10 @@ class PlanEditorXafs(QWidget):
             "start_next": True,
             "start_number": 1,
             "mode": "transmission",
-            "bounds_wavenumbers": False,
-            "bounds": [-200, -30, -10, 30, 200],
-            "steps": [10, 2, 0.2, 0.5],
-            "times": [1, 1, 1, 1],
-            # "filename": "",
+            "bounds": ["-200", "-30", "-10", "30", "200"],
+            "steps": ["10", "2", "0.2", "0.5"],
+            "times": ["1", "1", "1", "1"],
+            "filename": "",
         }
         return copy.deepcopy(default_parameters)
 
@@ -367,7 +362,7 @@ class PlanEditorXafs(QWidget):
         self._set_widgets_start_next(True)
         self._le_start.setText("")
 
-        self._set_widgets_wavenumber(True)
+        self._le_filename.setText("")
 
         self._clear_table()
         self._update_widget_state()
@@ -404,7 +399,7 @@ class PlanEditorXafs(QWidget):
         self._set_widgets_start_next(start_next)
         self._le_start.setText(f"{start_number}")
 
-        self._set_widgets_wavenumber(self._parameters["bounds_wavenumbers"])
+        self._le_filename.setText(f"{self._parameters['filename']}")
 
         self._fill_table()
         self._update_widget_state()
@@ -509,8 +504,7 @@ class PlanEditorXafs(QWidget):
             self._rb_start_number.setEnabled(False)
             self._le_start.setEnabled(False)
 
-            self._rb_units_wavenumber.setEnabled(False)
-            self._rb_units_energy.setEnabled(False)
+            self._le_filename.setEnabled(False)
 
             self._pb_split.setEnabled(False)
             self._pb_delete.setEnabled(False)
@@ -560,8 +554,8 @@ class PlanEditorXafs(QWidget):
             self._rb_start_number.setEnabled(edit_mode)
             self._le_start.setReadOnly(not edit_mode)
 
-            self._rb_units_wavenumber.setEnabled(False)
-            self._rb_units_energy.setEnabled(edit_mode)  # Change this when the feature is ready
+            self._le_filename.setEnabled(True)
+            self._le_filename.setReadOnly(not edit_mode)
 
             self._pb_split.setEnabled(edit_mode and region_selected)
             self._pb_delete.setEnabled(edit_mode and region_selected and more_than_one_region)
@@ -594,14 +588,12 @@ class PlanEditorXafs(QWidget):
         self._le_sample.setText(text)
         self._le_sample.setCursorPosition(0)
         self._parameters["sample"] = text
-        print(f"Changed sample description: '{text}'")
 
     def _le_preparation_editing_finished(self):
         text = self._le_preparation.text().strip()
         self._le_preparation.setText(text)
         self._le_preparation.setCursorPosition(0)
         self._parameters["preparation"] = text
-        print(f"Changed preparation notes: '{text}'")
 
     def _le_comment_editing_finished(self):
         text = self._le_comment.text().strip()
@@ -659,18 +651,18 @@ class PlanEditorXafs(QWidget):
         if checked:
             self._set_widgets_start_next(False)
 
-    def _set_widgets_wavenumber(self, wavenumber_used):
-        self._parameters["bounds_wavenumbers"] = wavenumber_used
-        self._rb_units_wavenumber.setChecked(wavenumber_used)
-        self._rb_units_energy.setChecked(not wavenumber_used)
+    def _validate_filename(self, filename):
+        return bool(re.search(r"^[0-9A-Za-z\.\-+_]+$", filename))
 
-    def _rb_units_wavenumber_clicked(self, checked):
-        if checked:
-            self._set_widgets_wavenumber(True)
+    def _le_filename_text_changed(self, text):
+        self._le_filename.setValid(self._validate_filename(text))
 
-    def _rb_units_energy_clicked(self, checked):
-        if checked:
-            self._set_widgets_wavenumber(False)
+    def _le_filename_editing_finished(self):
+        text = self._le_filename.text().strip()
+        if self._validate_filename(text):
+            self._parameters["filename"] = text
+        self._le_filename.setText(self._parameters["filename"])
+        self._le_filename.setCursorPosition(0)
 
     def _delete_region(self):
         sel_region = self._n_selected_region
@@ -689,16 +681,39 @@ class PlanEditorXafs(QWidget):
                 self._n_selected_region -= 1
             self._update_widgets()
 
+    def _interpret_boundary_value(self, bound_val):
+        bv = bound_val.strip().lower()
+        is_wavenumber = bv.endswith("k")
+        bv = bv[:-1] if is_wavenumber else bv
+        try:
+            bv = float(bv)
+            bv_energy = 3.81 * bv ** 2 if is_wavenumber else bv
+        except ValueError:
+            raise ValueError(f"Boundary value '{bound_val}' is incorrectly formatted or out of range")
+        return bv, bv_energy, is_wavenumber
+
     def _split_region(self):
         sel_region = self._n_selected_region
         n_regions = len(self._parameters["steps"])
         if 0 <= sel_region < n_regions:
-            bounds = self._parameters["bounds"]
-            new_bound = (bounds[sel_region] + bounds[sel_region + 1]) / 2
-            bounds.insert(sel_region + 1, new_bound)
-            self._parameters["steps"].insert(sel_region + 1, self._parameters["steps"][sel_region])
-            self._parameters["times"].insert(sel_region + 1, self._parameters["times"][sel_region])
-            self._update_widgets()
+            try:
+                bounds = self._parameters["bounds"]
+                bv1, bv_energy1, is_wavenumber1 = self._interpret_boundary_value(bounds[sel_region])
+                bv2, bv_energy2, is_wavenumber2 = self._interpret_boundary_value(bounds[sel_region + 1])
+                if (is_wavenumber1 and is_wavenumber2) or (not is_wavenumber1 and not is_wavenumber2):
+                    bv_center = f"{(bv1 + bv2) / 2}"
+                    if is_wavenumber1:
+                        bv_center += "k"
+                else:
+                    bv_center = f"{(bv_energy1 + bv_energy2) / 2}"
+
+                new_bound = bv_center
+                bounds.insert(sel_region + 1, new_bound)
+                self._parameters["steps"].insert(sel_region + 1, self._parameters["steps"][sel_region])
+                self._parameters["times"].insert(sel_region + 1, self._parameters["times"][sel_region])
+                self._update_widgets()
+            except ValueError as ex:
+                print(f"Failed to split the region: {ex}")
 
     def _pb_split_clicked(self):
         self._split_region()
@@ -727,6 +742,7 @@ class PlanEditorXafs(QWidget):
 
         table_item = self._table.item(row, column)
         text = table_item.text()
+        text = text.strip().lower()
 
         if column in (0, 1):
             data = self._parameters["bounds"]
@@ -738,14 +754,14 @@ class PlanEditorXafs(QWidget):
             return
 
         try:
-            v = float(text)
+            _, v_energy, _ = self._interpret_boundary_value(text)
             if column == 0:
-                data[row] = v
+                data[row] = text
             elif column in (2, 3):
-                if v > 0:
-                    data[row] = v
+                if v_energy > 0:
+                    data[row] = text
             elif column == 1:
-                data[row + 1] = v
+                data[row + 1] = text
         except ValueError:
             pass
 
@@ -762,7 +778,7 @@ class PlanEditorXafs(QWidget):
                 table_item = self._table.item(n_row, n_col)
                 if table_item.flags() & Qt.ItemIsEnabled:
                     try:
-                        float(table_item.text())
+                        self._interpret_boundary_value(table_item.text())
                         cell_valid = True
                     except Exception:
                         table_valid = False
@@ -773,7 +789,9 @@ class PlanEditorXafs(QWidget):
         # If the table is still valid, then check the order of the region bounds
         if table_valid:
             for n_row in range(n_rows):
-                if self._parameters["bounds"][n_row] >= self._parameters["bounds"][n_row + 1]:
+                _, bv_energy1, _ = self._interpret_boundary_value(self._parameters["bounds"][n_row])
+                _, bv_energy2, _ = self._interpret_boundary_value(self._parameters["bounds"][n_row + 1])
+                if bv_energy1 >= bv_energy2:
                     table_item1 = self._table.item(n_row, 0)
                     n_row2 = n_row + 1 if (n_row < n_rows - 1) else n_row
                     n_col2 = 0 if (n_row < n_rows - 1) else 1
@@ -831,16 +849,22 @@ class PlanEditorXafs(QWidget):
         self._parameters_last_submitted = copy.deepcopy(self._parameters)
         item = self._parameters_to_item(self._parameters)
         self.model.queue_item_add(item=item)
+        # TODO: include validation of results (display error message/option to retry)
         self._edit_mode = False
         self._plan_new = False
+        # Update the widget based on the currently selected item
+        self.slot_view_item(self.model.queue_item_uid_to_pos(self.model.selected_queue_item_uid))
         self._update_widgets()
 
     def _pb_save_clicked(self):
         self._parameters_last_submitted = copy.deepcopy(self._parameters)
         item = self._parameters_to_item(self._parameters, item_original=self._item_currently_loaded)
         self.model.queue_item_update(item=item)
+        # TODO: include validation of results (display error message/option to retry)
         self._edit_mode = False
         self._plan_new = False
+        # Update the widget based on the currently selected item
+        self.slot_view_item(self.model.queue_item_uid_to_pos(self.model.selected_queue_item_uid))
         self._update_widgets()
 
     def _pb_reset_clicked(self):
@@ -878,18 +902,13 @@ class PlanEditorXafs(QWidget):
             parameters["start_next"] = False
             parameters["start_number"] = start
         parameters["mode"] = item_params.get("mode", "")
+
+        parameters["filename"] = item_params.get("filename", "")
+
         bounds = item_params.get("bounds", "-200 200k")
         if isinstance(bounds, str):
-            bounds = bounds.strip()
-            if bounds.endswith("k"):
-                parameters["bounds_wavenumbers"] = True
-                bounds = bounds[:-1]
-            else:
-                parameters["bounds_wavenumbers"] = True
-            parameters["bounds"] = [float(_) for _ in bounds.split(" ")]
-        else:
-            parameters["bounds_wavenumbers"] = False
-            parameters["bounds"] = list(bounds)
+            bounds = bounds.strip().split()
+            parameters["bounds"] = [_.strip().lower() for _ in bounds]
 
         steps = item_params.get("steps", "1")
         if isinstance(steps, str):
@@ -925,14 +944,14 @@ class PlanEditorXafs(QWidget):
         kwargs["nscans"] = parameters["nscans"]
         kwargs["start"] = "next" if parameters["start_next"] else parameters["start_number"]
         kwargs["mode"] = parameters["mode"]
-        bounds = " ".join([f"{_}" for _ in parameters["bounds"]])
-        steps = " ".join([f"{_}" for _ in parameters["steps"]])
-        if parameters["bounds_wavenumbers"]:
-            bounds = f"{bounds}k"
-            steps = f"{steps}k"
-        kwargs["bounds"] = bounds
-        kwargs["steps"] = steps
+        kwargs["bounds"] = " ".join([f"{_}" for _ in parameters["bounds"]])
+        kwargs["steps"] = " ".join([f"{_}" for _ in parameters["steps"]])
         kwargs["times"] = " ".join([f"{_}" for _ in parameters["times"]])
+
+        filename = parameters["filename"]
+        # Don't include filename parameter if it is an empty string
+        if filename:
+            kwargs["filename"] = filename
 
         # The following parameters we don't set in the form, but they are needed for the plan to run.
         if "snapshots" not in kwargs:
