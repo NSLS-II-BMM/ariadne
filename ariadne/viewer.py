@@ -116,49 +116,6 @@ class Viewer(ViewerModel):
             else:
                 print(f"Unknown protocol: {source['protocol']}")
 
-            # # from bluesky_widgets.qt.zmq_dispatcher import RemoteDispatcher
-            # import msgpack
-            # import msgpack_numpy as mpn
-            #
-            # from bluesky_kafka import RemoteDispatcher
-            # from functools import partial
-            #
-            # # from bluesky_widgets.qt.zmq_dispatcher import RemoteDispatcher
-            # from bluesky_widgets.utils.streaming import (
-            #     stream_documents_into_runs,
-            # )
-            #
-            # bootstrap_servers = "kafka1.nsls2.bnl.gov:9092,kafka2.nsls2.bnl.gov:9092,kafka3.nsls2.bnl.gov:9092"
-            # kafka_deserializer = partial(msgpack.loads, object_hook=mpn.decode)
-            # topics = ["bmm.bluesky.runengine.documents"]
-            # consumer_config = {"auto.commit.interval.ms": 100, "auto.offset.reset": "latest"}
-            #
-            # self.dispatcher = RemoteDispatcher(
-            #     topics=topics,
-            #     bootstrap_servers=bootstrap_servers,
-            #     group_id="widgets_test",
-            #     consumer_config=consumer_config,
-            # )
-            #
-            # self.dispatcher.subscribe(stream_documents_into_runs(self.auto_plot_builder.add_run))
-            #
-            # from qtpy.QtCore import QThread
-            #
-            # class DispatcherStart(QThread):
-            #     def __init__(self, dispatcher):
-            #         super().__init__()
-            #         self._dispatcher = dispatcher
-            #
-            #     def run(self):
-            #         self._dispatcher.start()
-            #
-            # self.dispatcher_thread = DispatcherStart(self.dispatcher)
-            # self.dispatcher_thread.start()
-            #
-            # # for address in SETTINGS.subscribe_to:
-            # #    dispatcher = RemoteDispatcher(address)
-            # #    dispatcher.subscribe(stream_documents_into_runs(self.auto_plot_builder.add_run))
-            # #    dispatcher.start()
         widget = QtViewer(self)
         self._window = Window(widget, show=show)
 
