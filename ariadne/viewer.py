@@ -1,6 +1,5 @@
 import os
 
-from bluesky_widgets.models.auto_plot_builders import AutoLines
 from bluesky_widgets.models.run_engine_client import RunEngineClient
 from bluesky_widgets.qt import Window
 from bluesky_widgets.models.plot_specs import Axes, Figure
@@ -85,11 +84,8 @@ class Viewer(ViewerModel):
                 dispatcher.start()
 
             elif source["protocol"] == "kafka":
-                import msgpack
-                import msgpack_numpy as mpn
                 from bluesky_kafka import RemoteDispatcher
                 from bluesky_widgets.utils.streaming import stream_documents_into_runs
-                from functools import partial
                 from qtpy.QtCore import QThread
 
                 bootstrap_servers = source["servers"]

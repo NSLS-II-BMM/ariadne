@@ -15,6 +15,12 @@ class SearchWithButton(Search):
         self.events.add(view=Event)
 
 
+class RunAndView:
+    def __init__(self, run_engine, auto_plot_builder):
+        self.run_engine = run_engine
+        self.auto_plot_builder = auto_plot_builder
+
+
 class SearchAndView:
     def __init__(self, search, auto_plot_builder):
         self.search = search

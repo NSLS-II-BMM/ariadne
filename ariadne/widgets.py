@@ -30,7 +30,7 @@ from qtpy.QtWidgets import (
 )
 from qtpy.QtCore import Qt
 
-from .models import SearchAndView
+from .models import RunAndView, SearchAndView
 from .widget_xafs import PlanEditorXafs
 
 
@@ -157,11 +157,11 @@ class QtRunExperiment(QWidget):
         self.model = model
         vbox = QVBoxLayout()
         hbox = QHBoxLayout()
-        hbox.addWidget(QtReManagerConnection(model))
-        hbox.addWidget(QtReEnvironmentControls(model))
-        hbox.addWidget(QtReQueueControls(model))
-        hbox.addWidget(QtReExecutionControls(model))
-        hbox.addWidget(QtReStatusMonitor(model))
+        hbox.addWidget(QtReManagerConnection(model.run_engine))
+        hbox.addWidget(QtReEnvironmentControls(model.run_engine))
+        hbox.addWidget(QtReQueueControls(model.run_engine))
+        hbox.addWidget(QtReExecutionControls(model.run_engine))
+        hbox.addWidget(QtReStatusMonitor(model.run_engine))
 
         hbox.addStretch()
         vbox.addLayout(hbox)
@@ -169,12 +169,13 @@ class QtRunExperiment(QWidget):
         hbox = QHBoxLayout()
 
         vbox1 = QVBoxLayout()
-        vbox1.addWidget(QtReRunningPlan(model), stretch=1)
-        vbox1.addWidget(QtRePlanQueue(model), stretch=2)
+        vbox1.addWidget(QtReRunningPlan(model.run_engine), stretch=1)
+        vbox1.addWidget(QtRePlanQueue(model.run_engine), stretch=2)
         hbox.addLayout(vbox1)
         vbox2 = QVBoxLayout()
-        vbox2.addWidget(QtRePlanEditor(model), stretch=1)
-        vbox2.addWidget(PlanEditorXafs(model), stretch=1)
+        vbox2.addWidget(QtFigures(model.auto_plot_builder.figures))
+        # vbox2.addWidget(QtRePlanEditor(model), stretch=1)
+        # vbox2.addWidget(PlanEditorXafs(model), stretch=1)
         hbox.addLayout(vbox2)
 
         vbox.addLayout(hbox)
@@ -291,7 +292,7 @@ class QtViewer(QTabWidget):
 
         self.setTabPosition(QTabWidget.West)
 
-        self._run_experiment = QtRunExperiment(model.run_engine)
+        self._run_experiment = QtRunExperiment(RunAndView(model.run_engine, model.auto_plot_builder))
         self.addTab(self._run_experiment, "Run Experiment")
 
         self._organize_queue = QtOrganizeQueue(model.run_engine)
