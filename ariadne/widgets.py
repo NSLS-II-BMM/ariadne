@@ -181,6 +181,37 @@ class QtRunExperiment(QWidget):
         self.setLayout(vbox)
 
 
+class QtOrganizeQueueLeft(QSplitter):
+    def __init__(self, model, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.model = model
+
+        self.setOrientation(Qt.Vertical)
+
+        self._frame_top = QFrame(self)
+        self._frame_top.setFrameShape(QFrame.StyledPanel)
+
+        self._frame_bottom = QFrame(self)
+        self._frame_bottom.setFrameShape(QFrame.StyledPanel)
+
+        self.addWidget(self._frame_top)
+        self.addWidget(self._frame_bottom)
+
+        self._plan_editor = PlanEditorXafs(model)
+        self._plan_history = QtRePlanQueue(model)
+
+        vbox = QVBoxLayout()
+        vbox.addWidget(self._plan_editor, stretch=1)
+        self._frame_top.setLayout(vbox)
+
+        vbox = QVBoxLayout()
+        vbox.addWidget(self._plan_history, stretch=1)
+        self._frame_bottom.setLayout(vbox)
+
+        h = self.sizeHint().height()
+        self.setSizes([h, h])
+
+
 class QtOrganizeQueueRight(QSplitter):
     def __init__(self, model, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -228,7 +259,7 @@ class QtOrganizeQueueSplitter(QSplitter):
         self.addWidget(self._frame_left)
         self.addWidget(self._frame_right)
 
-        self._plan_editor = QtRePlanQueue(model)
+        self._plan_editor = QtOrganizeQueueLeft(model)
         self._right_splitter = QtOrganizeQueueRight(model)
 
         vbox = QVBoxLayout()
