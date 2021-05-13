@@ -95,12 +95,11 @@ class QtAddCustomPlot(QWidget):
     def _on_active_run_selected(self, event):
         self.x_selector.clear()
         self.y_selector.clear()
-        # TODO: Is there a way to get all stream_names?
-        # Hardcoding to primary and baseline for now
-        stream_names = ["primary", "baseline"]
-        for stream in stream_names:
+        for stream in self.model.search.active_run:
             self.x_selector.addItems(self.model.search.active_run[stream].to_dask().keys())
             self.y_selector.addItems(self.model.search.active_run[stream].to_dask().keys())
+        self.x_selector.addItem("time")
+        self.y_selector.addItem("time")
 
     def _on_new_button_clicked(self):
         axes = Axes()
@@ -122,13 +121,16 @@ class QtAddCustomPlot(QWidget):
             line.ys.append(self.y_selector.currentText())
 
     def _on_active_figure_changed(self, event):
+        if event.value == -1:
+            return
         active_index = self.model.auto_plot_builder.figures.active_index
         active_figure = self.model.auto_plot_builder.figures[active_index]
         self.x_selector.setCurrentText(active_figure.axes[0].x_label)
+        self.y_selector.setCurrentText(active_figure.axes[0].y_label)
         self.add_button.setEnabled(True)
 
     def _on_x_selector_text_changed(self, text):
-        if self.model.auto_plot_builder.figures.active_index is None:
+        if self.model.auto_plot_builder.figures.active_index in [None, -1]:
             return
         active_index = self.model.auto_plot_builder.figures.active_index
         active_figure = self.model.auto_plot_builder.figures[active_index]
