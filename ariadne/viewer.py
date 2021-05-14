@@ -14,7 +14,16 @@ from .settings import SETTINGS
 class AutoBMMPlot(AutoPlotter):
     def __init__(self):
         super().__init__()
-        self._lines_instances = {}
+        self._models = {}
+
+        self.plot_builders.events.removed.connect(self._on_plot_builder_removed)
+
+    def _on_plot_builder_removed(self, event):
+        plot_builder = event.item
+        for key in list(self._models):
+            for line in self._models[key]:
+                if line == plot_builder:
+                    del self._models[key]
 
     def handle_new_stream(self, run, stream_name):
         if stream_name != "primary":
@@ -25,42 +34,35 @@ class AutoBMMPlot(AutoPlotter):
         models = []
         figures = []
 
-        key = (xx, to_plot)
+        if to_plot == "It":
+            y_key = ("It/I0", "I0")
+        elif to_plot == "I0":
+            y_key = ("I0",)
+        elif to_plot == "Ir":
+            y_key = "It/I0, I0"
 
-        try:
-            models = self._lines_instances[key]
-        except KeyError:
-            models = []
-
-            if to_plot == "It":
-                axes1 = Axes()
-                figure1 = Figure((axes1,), title="It/I0")
-                figures.append(figure1)
-                models.append(Lines(x=xx, ys=["It/I0"], max_runs=3, axes=axes1))
-                axes2 = Axes()
-                figure2 = Figure((axes2,), title="I0")
-                figures.append(figure2)
-                models.append(Lines(x=xx, ys=["I0"], max_runs=3, axes=axes2))
-            elif to_plot == "I0":
+        for y in y_key:
+            key = (xx, y, to_plot)
+            try:
+                # dcm_energy, "It/I0", "It"
+                # dcm_energy, "I0", "It"
+                # dcm_energy, "I0", "I0"
+                # dcm_energy, "It/I0, I0", "Ir"
+                models = self._models[key]
+            except KeyError:
+                x, ys, to_plot = key
+                models = []
                 axes = Axes()
-                figure = Figure((axes,), title="I0")
-                figures.append(figure)
-                models.append(Lines(x=xx, ys=["I0"], max_runs=3, axes=axes))
-            elif to_plot == "Ir":
-                axes1 = Axes()
-                axes2 = Axes()
-                figure = Figure((axes1, axes2), title="It and I0")
-                figures.append(figure)
-                models.append(Lines(x=xx, ys=["It/I0"], max_runs=3, axes=axes1))
-                models.append(Lines(x=xx, ys=["I0"], max_runs=3, axes=axes2))
-            else:
-                # Plot nothing.
-                pass
-            self._lines_instances[key] = models
-            self.figures.extend(figures)
-        for model in models:
-            model.add_run(run)
-            self.plot_builders.append(model)
+                figure = Figure((axes,), title=ys)
+                for ys in ys.split(", "):
+                    models.append(Lines(x=x, ys=[ys], max_runs=3, axes=axes))
+                self._models[key] = models
+                self.figures.append(figure)
+            finally:
+                for model in models:
+                    model.add_run(run)
+                    self.plot_builders.append(model)
+                continue
 
 
 class ViewerModel:
