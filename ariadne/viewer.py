@@ -39,23 +39,21 @@ class AutoBMMPlot(AutoPlotter):
         elif to_plot == "I0":
             y_key = ("I0",)
         elif to_plot == "Ir":
-            y_key = "It/I0, I0"
+            y_key = ("It/I0, I0",)
 
         for y in y_key:
             key = (xx, y, to_plot)
             try:
-                # dcm_energy, "It/I0", "It"
-                # dcm_energy, "I0", "It"
-                # dcm_energy, "I0", "I0"
-                # dcm_energy, "It/I0, I0", "Ir"
                 models = self._models[key]
             except KeyError:
                 x, ys, to_plot = key
                 models = []
-                axes = Axes()
-                figure = Figure((axes,), title=ys)
+                axes_list = []
                 for ys in ys.split(", "):
+                    axes = Axes()
+                    axes_list.append(axes)
                     models.append(Lines(x=x, ys=[ys], max_runs=3, axes=axes))
+                figure = Figure(tuple(axes_list), title=ys)
                 self._models[key] = models
                 self.figures.append(figure)
             finally:
