@@ -571,17 +571,14 @@ class PlanEditorXafs(QWidget):
     def _combo_element_current_index_changed(self, index):
         if index >= 0:
             self._parameters["element"] = self._combo_element.currentText()
-            print(f"Changed element: {self._parameters['element']}")
 
     def _combo_edge_current_index_changed(self, index):
         if index >= 0:
             self._parameters["edge"] = self._combo_edge.currentText()
-            print(f"Changed edge: {self._parameters['edge']}")
 
     def _combo_mode_current_index_changed(self, index):
         if index >= 0:
             self._parameters["mode"] = self._combo_mode.currentText()
-            print(f"Changed mode: {self._parameters['mode']}")
 
     def _le_sample_editing_finished(self):
         text = self._le_sample.text().strip()
