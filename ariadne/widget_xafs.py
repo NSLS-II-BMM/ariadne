@@ -130,7 +130,7 @@ class LineEditReadOnly(LineEditExtended):
 class PlanEditorXafs(QWidget):
 
     signal_update_widgets = Signal()
-    signal_update_selection = Signal(int)
+    signal_update_selection = Signal(object)
 
     def __init__(self, model, parent=None, *, editable=False, detailed=True):
         super().__init__(parent)
@@ -571,17 +571,14 @@ class PlanEditorXafs(QWidget):
     def _combo_element_current_index_changed(self, index):
         if index >= 0:
             self._parameters["element"] = self._combo_element.currentText()
-            print(f"Changed element: {self._parameters['element']}")
 
     def _combo_edge_current_index_changed(self, index):
         if index >= 0:
             self._parameters["edge"] = self._combo_edge.currentText()
-            print(f"Changed edge: {self._parameters['edge']}")
 
     def _combo_mode_current_index_changed(self, index):
         if index >= 0:
             self._parameters["mode"] = self._combo_mode.currentText()
-            print(f"Changed mode: {self._parameters['mode']}")
 
     def _le_sample_editing_finished(self):
         text = self._le_sample.text().strip()
@@ -853,7 +850,7 @@ class PlanEditorXafs(QWidget):
         self._edit_mode = False
         self._plan_new = False
         # Update the widget based on the currently selected item
-        self.slot_view_item(self.model.queue_item_uid_to_pos(self.model.selected_queue_item_uid))
+        self.slot_view_item(self.model.selected_queue_item_uids)
         self._update_widgets()
 
     def _pb_save_clicked(self):
@@ -864,7 +861,7 @@ class PlanEditorXafs(QWidget):
         self._edit_mode = False
         self._plan_new = False
         # Update the widget based on the currently selected item
-        self.slot_view_item(self.model.queue_item_uid_to_pos(self.model.selected_queue_item_uid))
+        self.slot_view_item(self.model.selected_queue_item_uids)
         self._update_widgets()
 
     def _pb_reset_clicked(self):
@@ -874,14 +871,11 @@ class PlanEditorXafs(QWidget):
     def _pb_cancel_clicked(self):
         self._edit_mode = False
         self._plan_new = False
-        sel_item_uid = self.model.selected_queue_item_uid
-        sel_item_pos = self.model.queue_item_uid_to_pos(sel_item_uid)
-        self.slot_view_item(sel_item_pos)
+        self.slot_view_item(self.model.selected_queue_item_uids)
 
     def on_queue_item_selection_changed(self, event):
-        sel_item_uid = event.selected_item_uid
-        sel_item_pos = self.model.queue_item_uid_to_pos(sel_item_uid)
-        self.signal_update_selection.emit(sel_item_pos)
+        sel_item_uids = event.selected_item_uids
+        self.signal_update_selection.emit(sel_item_uids)
 
     def _item_to_parameters(self, item):
         # Simplified assumption that all arguments are kwargs
@@ -964,23 +958,29 @@ class PlanEditorXafs(QWidget):
         item.update({"item_type": "plan", "name": "xafs", "args": [], "kwargs": kwargs})
         return item
 
-    @Slot(int)
-    def slot_view_item(self, sel_item_pos):
+    @Slot(object)
+    def slot_view_item(self, sel_item_uids):
         # If the widget is in edit mode, then ignore selection change
         if self._edit_mode:
             return
 
-        if sel_item_pos >= 0:
-            item = copy.deepcopy(self.model._plan_queue_items[sel_item_pos])
-            item_name = item.get("name", "")
+        # The viewer is blank if more than 1 item is selected.
+        if len(sel_item_uids) == 1:
+            sel_item_uid = sel_item_uids[0]
+            sel_item_pos = self.model.queue_item_uid_to_pos(sel_item_uid)
+
+            if sel_item_pos >= 0:
+                item = copy.deepcopy(self.model._plan_queue_items[sel_item_pos])
+                item_name = item.get("name", "")
+            else:
+                item, item_name = None, ""
         else:
-            item = None
-            item_name = ""
+            item, item_name = None, ""
 
         self._item_currently_loaded = copy.deepcopy(item)
 
-        # View only plans named 'xafs' and 'xafs_scan'
-        if item_name in ("xafs", "xafs_scan"):
+        # View only plans named 'xafs'
+        if item_name in ("xafs",):
             self._parameters = self._item_to_parameters(item)
             self._plan_empty = False
             self._edit_mode = False
