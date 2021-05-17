@@ -35,25 +35,25 @@ class AutoBMMPlot(AutoPlotter):
         figures = []
 
         if to_plot == "It":
-            y_key = ("It/I0", "I0")
+            y_keys = (("It/I0",), ("I0",))
         elif to_plot == "I0":
-            y_key = ("I0",)
+            y_keys = (("I0",),)
         elif to_plot == "Ir":
-            y_key = ("It/I0, I0",)
+            y_keys = (("It/I0", "I0"),)
 
-        for y in y_key:
-            key = (xx, y, to_plot)
+        for y_key in y_keys:
+            key = (xx, y_key, to_plot)
             try:
                 models = self._models[key]
             except KeyError:
                 x, ys, to_plot = key
                 models = []
                 axes_list = []
-                for ys in ys.split(", "):
+                for y in ys:
                     axes = Axes()
                     axes_list.append(axes)
-                    models.append(Lines(x=x, ys=[ys], max_runs=3, axes=axes))
-                figure = Figure(tuple(axes_list), title=ys)
+                    models.append(Lines(x=x, ys=[y], max_runs=3, axes=axes))
+                figure = Figure(tuple(axes_list), title=y)
                 self._models[key] = models
                 self.figures.append(figure)
             finally:
