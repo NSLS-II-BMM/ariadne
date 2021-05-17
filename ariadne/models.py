@@ -35,7 +35,7 @@ class SearchAndView:
         if catalog is None:
             return
         for uid, run in catalog.items():
-            self.auto_plot_builder.add_run(run, pinned=True)
+            self.auto_plot_builder.add_run(run)
 
     def _on_figure_added(self, event):
         figure = event.item

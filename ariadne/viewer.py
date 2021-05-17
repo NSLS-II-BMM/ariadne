@@ -12,6 +12,19 @@ from .settings import SETTINGS
 
 
 class AutoBMMPlot(AutoPlotter):
+    def __init__(self):
+        super().__init__()
+        self._models = {}
+
+        self.plot_builders.events.removed.connect(self._on_plot_builder_removed)
+
+    def _on_plot_builder_removed(self, event):
+        plot_builder = event.item
+        for key in list(self._models):
+            for line in self._models[key]:
+                if line == plot_builder:
+                    del self._models[key]
+
     def handle_new_stream(self, run, stream_name):
         if stream_name != "primary":
             return
@@ -20,34 +33,34 @@ class AutoBMMPlot(AutoPlotter):
         to_plot = run.metadata["start"].get("plot_request", "It")
         models = []
         figures = []
+
         if to_plot == "It":
-            axes1 = Axes()
-            figure1 = Figure((axes1,), title="It/I0")
-            figures.append(figure1)
-            models.append(Lines(x=xx, ys=["It/I0"], max_runs=1, axes=axes1))
-            axes2 = Axes()
-            figure2 = Figure((axes2,), title="I0")
-            figures.append(figure2)
-            models.append(Lines(x=xx, ys=["I0"], max_runs=1, axes=axes2))
+            y_keys = (("It/I0",), ("I0",))
         elif to_plot == "I0":
-            axes = Axes()
-            figure = Figure((axes,), title="I0")
-            figures.append(figure)
-            models.append(Lines(x=xx, ys=["I0"], max_runs=1, axes=axes))
+            y_keys = (("I0",),)
         elif to_plot == "Ir":
-            axes1 = Axes()
-            axes2 = Axes()
-            figure = Figure((axes1, axes2), title="It and I0")
-            figures.append(figure)
-            models.append(Lines(x=xx, ys=["It/I0"], max_runs=1, axes=axes1))
-            models.append(Lines(x=xx, ys=["I0"], max_runs=1, axes=axes2))
-        else:
-            # Plot nothing.
-            pass
-        for model in models:
-            model.add_run(run)
-            self.plot_builders.append(model)
-        self.figures.extend(figures)
+            y_keys = (("It/I0", "I0"),)
+
+        for y_key in y_keys:
+            key = (xx, y_key, to_plot)
+            try:
+                models = self._models[key]
+            except KeyError:
+                x, ys, to_plot = key
+                models = []
+                axes_list = []
+                for y in ys:
+                    axes = Axes()
+                    axes_list.append(axes)
+                    models.append(Lines(x=x, ys=[y], max_runs=3, axes=axes))
+                figure = Figure(tuple(axes_list), title=y)
+                self._models[key] = models
+                self.figures.append(figure)
+            finally:
+                for model in models:
+                    model.add_run(run)
+                    self.plot_builders.append(model)
+                continue
 
 
 class ViewerModel:
