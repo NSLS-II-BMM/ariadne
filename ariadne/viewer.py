@@ -35,11 +35,11 @@ class AutoBMMPlot(AutoPlotter):
         figures = []
 
         if to_plot == "It":
-            y_keys = (("It/I0",), ("I0",))
+            y_keys = (("log(It/I0)",), ("I0",))
         elif to_plot == "I0":
             y_keys = (("I0",),)
         elif to_plot == "Ir":
-            y_keys = (("It/I0", "I0"),)
+            y_keys = (("log(It/I0)", "I0"),)
 
         for y_key in y_keys:
             key = (xx, y_key, to_plot)
