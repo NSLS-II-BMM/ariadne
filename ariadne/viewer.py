@@ -26,6 +26,7 @@ class AutoBMMPlot(AutoPlotter):
                     del self._models[key]
 
     def handle_new_stream(self, run, stream_name):
+        # TODO: revisit this for xafs plan to_plot option
         if stream_name != "primary":
             return
 
@@ -35,11 +36,11 @@ class AutoBMMPlot(AutoPlotter):
         figures = []
 
         if to_plot == "It":
-            y_keys = (("log(It/I0)",), ("I0",))
+            y_keys = (("log(I0/It)",), ("I0",))
         elif to_plot == "I0":
             y_keys = (("I0",),)
         elif to_plot == "Ir":
-            y_keys = (("log(It/I0)", "I0"),)
+            y_keys = (("log(I0/It)", "I0"),)
 
         for y_key in y_keys:
             key = (xx, y_key, to_plot)
