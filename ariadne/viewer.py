@@ -132,6 +132,13 @@ class Viewer(ViewerModel):
             else:
                 print(f"Unknown protocol: {source['protocol']}")
 
+        # Customize Run Engine model for BMM:
+        #   - name of the module that contains custom code modules
+        #     (conversion of spreadsheets to sequences of plans)
+        self.run_engine.qserver_custom_module_name = "bluesky-httpserver-bmm"
+        #   - list of names of spreadsheet types
+        self.run_engine.plan_spreadsheet_data_types = ["wheel_xafs"]
+
         widget = QtViewer(self)
         self._window = Window(widget, show=show)
 
