@@ -89,7 +89,7 @@ class QtAddCustomPlot(QWidget):
         self.add_button.clicked.connect(self._on_add_button_clicked)
         active_search_model = self.model.search
         active_search_model.events.active_run.connect(self._on_active_run_selected)
-        self.model.auto_plot_builder.figures.events.active_index.connect(self._on_active_figure_changed)
+        self.model.databroker_auto_plot_builder.figures.events.active_index.connect(self._on_active_figure_changed)
         self.x_selector.currentTextChanged.connect(self._on_x_selector_text_changed)
 
     def _on_active_run_selected(self, event):
@@ -109,13 +109,13 @@ class QtAddCustomPlot(QWidget):
         if self.model.search.active_run:
             line.add_run(self.model.search.active_run)
 
-        self.model.auto_plot_builder.plot_builders.append(line)
-        self.model.auto_plot_builder.figures.append(figure)
+        self.model.databroker_auto_plot_builder.plot_builders.append(line)
+        self.model.databroker_auto_plot_builder.figures.append(figure)
 
     def _on_add_button_clicked(self):
-        if self.model.auto_plot_builder.figures.active_index is None:
+        if self.model.databroker_auto_plot_builder.figures.active_index is None:
             return
-        active_index = self.model.auto_plot_builder.figures.active_index
+        active_index = self.model.databroker_auto_plot_builder.figures.active_index
         active_uuid = list(self.model._figures_to_lines.keys())[active_index]
         for line in self.model._figures_to_lines[active_uuid]:
             line.ys.append(self.y_selector.currentText())
@@ -123,17 +123,17 @@ class QtAddCustomPlot(QWidget):
     def _on_active_figure_changed(self, event):
         if event.value == -1:
             return
-        active_index = self.model.auto_plot_builder.figures.active_index
-        active_figure = self.model.auto_plot_builder.figures[active_index]
+        active_index = self.model.databroker_auto_plot_builder.figures.active_index
+        active_figure = self.model.databroker_auto_plot_builder.figures[active_index]
         self.x_selector.setCurrentText(active_figure.axes[0].x_label)
         self.y_selector.setCurrentText(active_figure.axes[0].y_label)
         self.add_button.setEnabled(True)
 
     def _on_x_selector_text_changed(self, text):
-        if self.model.auto_plot_builder.figures.active_index in [None, -1]:
+        if self.model.databroker_auto_plot_builder.figures.active_index in [None, -1]:
             return
-        active_index = self.model.auto_plot_builder.figures.active_index
-        active_figure = self.model.auto_plot_builder.figures[active_index]
+        active_index = self.model.databroker_auto_plot_builder.figures.active_index
+        active_figure = self.model.databroker_auto_plot_builder.figures[active_index]
         if text != active_figure.axes[0].x_label:
             self.add_button.setEnabled(False)
         else:
@@ -149,7 +149,7 @@ class QtSearchAndView(QWidget):
         layout.addWidget(QtSearchWithButton(model.search))
         plot_layout = QVBoxLayout()
         plot_layout.addWidget(QtAddCustomPlot(self.model))
-        plot_layout.addWidget(QtFigures(model.auto_plot_builder.figures))
+        plot_layout.addWidget(QtFigures(model.databroker_auto_plot_builder.figures))
         layout.addLayout(plot_layout)
 
 
@@ -175,7 +175,7 @@ class QtRunExperiment(QWidget):
         vbox1.addWidget(QtRePlanQueue(model.run_engine), stretch=2)
         hbox.addLayout(vbox1)
         vbox2 = QVBoxLayout()
-        vbox2.addWidget(QtFigures(model.auto_plot_builder.figures))
+        vbox2.addWidget(QtFigures(model.live_auto_plot_builder.figures))
         # vbox2.addWidget(QtRePlanEditor(model), stretch=1)
         # vbox2.addWidget(PlanEditorXafs(model), stretch=1)
         hbox.addLayout(vbox2)
@@ -294,11 +294,11 @@ class QtViewer(QTabWidget):
 
         self.setTabPosition(QTabWidget.West)
 
-        self._run_experiment = QtRunExperiment(RunAndView(model.run_engine, model.auto_plot_builder))
+        self._run_experiment = QtRunExperiment(RunAndView(model.run_engine, model.live_auto_plot_builder))
         self.addTab(self._run_experiment, "Run Experiment")
 
         self._organize_queue = QtOrganizeQueue(model.run_engine)
         self.addTab(self._organize_queue, "Organize Queue")
 
-        self._search_and_view = QtSearchAndView(SearchAndView(model.search, model.auto_plot_builder))
+        self._search_and_view = QtSearchAndView(SearchAndView(model.search, model.databroker_auto_plot_builder))
         self.addTab(self._search_and_view, "Data Broker")

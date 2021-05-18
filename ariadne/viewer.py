@@ -70,7 +70,10 @@ class ViewerModel:
 
     def __init__(self):
         self.search = SearchWithButton(SETTINGS.catalog, columns=SETTINGS.columns)
-        self.auto_plot_builder = AutoBMMPlot()
+        # auto_plot_builder for live plotting
+        self.live_auto_plot_builder = AutoBMMPlot()
+        # auto_plot_builder for databroker plotting
+        self.databroker_auto_plot_builder = AutoBMMPlot()
 
         self.run_engine = RunEngineClient(zmq_server_address=os.environ.get("QSERVER_ZMQ_ADDRESS", None))
 
@@ -93,7 +96,7 @@ class Viewer(ViewerModel):
                 zmq_addr = source["zmq_addr"]
 
                 dispatcher = RemoteDispatcher(zmq_addr)
-                dispatcher.subscribe(stream_documents_into_runs(self.auto_plot_builder.add_run))
+                dispatcher.subscribe(stream_documents_into_runs(self.live_auto_plot_builder.add_run))
                 dispatcher.start()
 
             elif source["protocol"] == "kafka":
@@ -113,7 +116,7 @@ class Viewer(ViewerModel):
                     consumer_config=consumer_config,
                 )
 
-                self.dispatcher.subscribe(stream_documents_into_runs(self.auto_plot_builder.add_run))
+                self.dispatcher.subscribe(stream_documents_into_runs(self.live_auto_plot_builder.add_run))
 
                 class DispatcherStart(QThread):
                     def __init__(self, dispatcher):
