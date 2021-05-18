@@ -60,7 +60,6 @@ class AutoBMMPlot(AutoPlotter):
                 for model in models:
                     model.add_run(run)
                     self.plot_builders.append(model)
-                # continue
 
 
 class ViewerModel:
