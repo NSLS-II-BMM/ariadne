@@ -33,6 +33,7 @@ class AutoBMMPlot(AutoPlotter):
         models.append(
             Lines(x=x_values, ys=['I0',],    max_runs=1, axes=axes2)
         )
+
         return models, figures
 
     def I0(self, run, stream_name):
@@ -63,3 +64,5 @@ class AutoBMMPlot(AutoPlotter):
         )
         models.append(
             Lines(x=x_values, ys=['I0',],    max_runs=1, axes=axes2)
+
+        return models, figures
