@@ -1,3 +1,8 @@
-def test_one_plus_one_is_two():
-    "Check that one and one are indeed two."
-    assert 1 + 1 == 2
+from databroker._drivers.jsonl import BlueskyJSONLCatalog
+
+def test_from_config():
+    catalog = BlueskyJSONLCatalog(
+        "./ariadne/tests/*.jsonl",
+        name='bmm')
+    assert len(catalog)
+
