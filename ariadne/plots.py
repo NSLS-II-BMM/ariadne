@@ -8,7 +8,7 @@ class AutoBMMPlot(AutoPlotter):
     def handle_new_stream(self, run, stream_name):
         if stream_name == 'primary':
             #getattr(self, run.metadata['plan_name'])(run, stream_name)
-            models, figures = getattr(self, run.metadata.get('plot_request', 'It')(run, stream_name)
+            models, figures = getattr(self, run.metadata.get('plot_request', 'It'))(run, stream_name)
 
             for model in models:
                 model.add_run(run)
@@ -16,12 +16,13 @@ class AutoBMMPlot(AutoPlotter):
             self.figures.extend(figures)
 
     def It(self, run, stream_name):
-        x_values = run.metadata['start']['motors'][0]
+        # FIXME: Need to sort out how to get the correct motor here
+        x_values = run.metadata['start']['motors'][1]
         models = []
         figures = []
 
         axes1 = Axes()
-        figure1 = Figure((axes1,), title="It/I0")
+        figure1 = Figure((axes1,), title="It_divided_by_I0")
         figures.append(figure1)
         models.append(
             Lines(x=x_values, ys=['It/I0',], max_runs=1, axes=axes1)
@@ -64,5 +65,6 @@ class AutoBMMPlot(AutoPlotter):
         )
         models.append(
             Lines(x=x_values, ys=['I0',],    max_runs=1, axes=axes2)
+        )
 
         return models, figures
