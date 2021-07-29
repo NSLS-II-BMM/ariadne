@@ -2,7 +2,6 @@ import os
 from pathlib import Path
 import pytest
 import tempfile
-
 from databroker._drivers.jsonl import BlueskyJSONLCatalog
 from databroker.core import BlueskyRunFromGenerator
 
@@ -15,34 +14,30 @@ from ..kafka_previews import export_thumbnails_when_complete
 @pytest.fixture(scope='module')
 def catalog():
     catalog = BlueskyJSONLCatalog(
-        "./ariadne/tests/*.jsonl",
+        f"{Path(__file__).parent.resolve()}/*.jsonl",
         name='bmm')
     return catalog
 
 def test_from_config(catalog):
-    #catalog = BlueskyJSONLCatalog(
-    #    "./ariadne/tests/*.jsonl",
-    #    name='bmm')
     assert len(catalog)
 
 @pytest.mark.parametrize(
     "uid,titles",
     [
-        ("12a63104-f8e1-4491-9f3e-e03a30575e33", ["It_divided_by_I0", "I0"]),
+        ("1dccff46-2576-4da2-8971-4de1ee4e98b7", ["It_divided_by_I0", "I0"]),
+        ("d748dbdc-cec4-4211-b626-801f1799cb56", ["It_divided_by_I0", "I0"]),
+        ("ac694ff6-2444-49af-8898-bfa23d99c28c", ["It_divided_by_I0", "I0"]),
     ]
 )
 def test_export_(catalog, uid, titles):
-    # delete files first
-    documents = catalog[uid].canonical(fill='no')
-    # print(len(list(documents)))
     plotting = stream_documents_into_runs(export_thumbnails_when_complete)
-    counter = 0
-    for name, doc in documents:
-        print(counter)
-        plotting(name, doc)
-        counter += 1
-    for title in titles:
-        plot = os.path.join(tempfile.gettempdir(), "bluesky_widgets_example", uid, f"{title}.png")
-        assert Path(plot).exists()
 
-# test Qt plots
+    for name, doc in catalog[uid].canonical(fill='no'):
+        plotting(name, doc)
+
+    for title in titles:
+        plot_file = os.path.join(tempfile.gettempdir(),
+                                 "bluesky_widgets_example",
+                                 uid, f"{title}.png")
+        assert Path(plot_file).exists()
+        os.remove(plot_file)
