@@ -1,15 +1,14 @@
 import os
-from pathlib import Path
 import pytest
 import tempfile
+from pathlib import Path
+
 from databroker._drivers.jsonl import BlueskyJSONLCatalog
 from databroker.core import BlueskyRunFromGenerator
-
 from bluesky_widgets.utils.streaming import stream_documents_into_runs
-
 from bluesky_live.run_builder import RunBuilder
-
 from ..kafka_previews import export_thumbnails_when_complete
+
 
 @pytest.fixture(scope='module')
 def catalog():
@@ -18,8 +17,10 @@ def catalog():
         name='bmm')
     return catalog
 
+
 def test_from_config(catalog):
     assert len(catalog)
+
 
 @pytest.mark.parametrize(
     "uid,titles",
@@ -30,14 +31,13 @@ def test_from_config(catalog):
     ]
 )
 def test_export_(catalog, uid, titles):
-    plotting = stream_documents_into_runs(export_thumbnails_when_complete)
+    plotter = stream_documents_into_runs(export_thumbnails_when_complete)
 
     for name, doc in catalog[uid].canonical(fill='no'):
-        plotting(name, doc)
+        plotter(name, doc)
 
     for title in titles:
-        plot_file = os.path.join(tempfile.gettempdir(),
-                                 "bluesky_widgets_example",
+        plot_file = os.path.join(tempfile.gettempdir(),"ariadne",
                                  uid, f"{title}.png")
         assert Path(plot_file).exists()
         os.remove(plot_file)

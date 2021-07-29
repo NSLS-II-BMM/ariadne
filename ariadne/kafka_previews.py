@@ -26,8 +26,8 @@ def export_thumbnails_when_complete(run):
     view = HeadlessFigures(model.figures)
 
     uid = run.metadata["start"]["uid"]
-    directory = os.path.join(tempfile.gettempdir(), "bluesky_widgets_example", uid)
-    os.makedirs(directory, exist_ok=True)
+    directory = os.path.join(tempfile.gettempdir(), "ariadne", uid)
+    os.makedirs(directory, exist_ok=True):
 
     # If the Run is already done by the time we got it, export now.
     # Otherwise, schedule it to export whenever it finishes.
@@ -50,7 +50,7 @@ def export_thumbnails_while_live(run):
     view = HeadlessFigures(model.figures)
 
     uid = run.metadata["start"]["uid"]
-    directory = os.path.join(tempfile.gettempdir(), "bluesky_widgets_example", uid)
+    directory = os.path.join(tempfile.gettempdir(), "ariadne", uid)
     os.makedirs(directory, exist_ok=True)
 
     # If the Run is already done by the time we got it, export now.
