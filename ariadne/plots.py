@@ -2,18 +2,21 @@ from bluesky_widgets.models.auto_plot_builders import AutoPlotter
 from bluesky_widgets.models.plot_builders import Lines
 from bluesky_widgets.models.plot_specs import Axes, Figure
 
-
 class AutoBMMPlot(AutoPlotter):
 
     def handle_new_stream(self, run, stream_name):
         if stream_name == 'primary':
-            #getattr(self, run.metadata['plan_name'])(run, stream_name)
-            models, figures = getattr(self, run.metadata.get('plot_request', 'It'))(run, stream_name)
+            plan_name = run.metadata.get('plan_name').replace(' ', '_')
 
-            for model in models:
-                model.add_run(run)
-                self.plot_builders.append(model)
-            self.figures.extend(figures)
+            # Check if plotting has been configured for this plan_name.
+            # If there is no plotting configured, do nothing.
+            if hasattr(self, plan_name):
+                models, figures = getattr(self, plan_name)(run, stream_name)
+                for model in models:
+                    model.add_run(run)
+                    self.plot_builders.append(model)
+                self.figures.extend(figures)
+
 
     def It(self, run, stream_name):
         # FIXME: Need to sort out how to get the correct motor here
