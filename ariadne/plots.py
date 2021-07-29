@@ -18,7 +18,7 @@ class AutoBMMPlot(AutoPlotter):
                 self.figures.extend(figures)
 
 
-    def It(self, run, stream_name):
+    def rel_scan_linescan_xafs_y_lt(self, run, stream_name):
         # FIXME: Need to sort out how to get the correct motor here
         x_values = run.metadata['start']['motors'][1]
         models = []
@@ -40,7 +40,7 @@ class AutoBMMPlot(AutoPlotter):
 
         return models, figures
 
-    def I0(self, run, stream_name):
+    def rel_scan_linescan_xafs_pitch_lt(self, run, stream_name):
         x_values = run.metadata['start']['motors'][0]
         models = []
         figures = []
@@ -54,7 +54,7 @@ class AutoBMMPlot(AutoPlotter):
 
         return models, figures
 
-    def Ir(self, run, stream_name):
+    def scan_nd_xafs_trans(self, run, stream_name):
         x_values = run.metadata['start']['motors'][0]
         models = []
         figures = []
