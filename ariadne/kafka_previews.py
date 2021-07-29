@@ -38,6 +38,30 @@ def export_thumbnails_when_complete(run):
 
 
     if run_is_live_and_not_completed(run):
+        run.events.completed.connect(export)
+    else:
+        export()
+
+
+def export_thumbnails_while_live(run):
+    "Given a BlueskyRun, export thumbnail(s) to a directory while it updates."
+    model = AutoBMMPlot()
+    model.add_run(run)
+    view = HeadlessFigures(model.figures)
+
+    uid = run.metadata["start"]["uid"]
+    directory = os.path.join(tempfile.gettempdir(), "bluesky_widgets_example", uid)
+    os.makedirs(directory, exist_ok=True)
+
+    # If the Run is already done by the time we got it, export now.
+    # Otherwise, schedule it to export whenever it finishes.
+    def export(*args, **kwargs):
+        filenames = view.export_all(directory)
+        print("\n".join(f'"{filename}"' for filename in filenames))
+        view.close()
+
+
+    if run_is_live_and_not_completed(run):
         run.events.new_data.connect(export)
     else:
         export()

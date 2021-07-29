@@ -10,57 +10,7 @@ from .widgets import QtViewer
 from .models import SearchWithButton
 from .settings import SETTINGS
 
-
-class AutoBMMPlot(AutoPlotter):
-    def __init__(self):
-        super().__init__()
-        self._models = {}
-
-        self.plot_builders.events.removed.connect(self._on_plot_builder_removed)
-
-    def _on_plot_builder_removed(self, event):
-        plot_builder = event.item
-        for key in list(self._models):
-            for line in self._models[key]:
-                if line == plot_builder:
-                    del self._models[key]
-
-    def handle_new_stream(self, run, stream_name):
-        # TODO: revisit this for xafs plan to_plot option
-        if stream_name != "primary":
-            return
-
-        xx = run.metadata["start"]["motors"][0]
-        to_plot = run.metadata["start"].get("plot_request", "It")
-        models = []
-        figures = []
-
-        if to_plot == "It":
-            y_keys = (("log(I0/It)",), ("I0",))
-        elif to_plot == "I0":
-            y_keys = (("I0",),)
-        elif to_plot == "Ir":
-            y_keys = (("log(I0/It)", "I0"),)
-
-        for y_key in y_keys:
-            key = (xx, y_key, to_plot)
-            try:
-                models = self._models[key]
-            except KeyError:
-                x, ys, to_plot = key
-                models = []
-                axes_list = []
-                for y in ys:
-                    axes = Axes()
-                    axes_list.append(axes)
-                    models.append(Lines(x=x, ys=[y], max_runs=3, axes=axes))
-                figure = Figure(tuple(axes_list), title=y)
-                self._models[key] = models
-                self.figures.append(figure)
-            finally:
-                for model in models:
-                    model.add_run(run)
-                    self.plot_builders.append(model)
+from .plots import AutoBMMPlot
 
 
 class ViewerModel:
