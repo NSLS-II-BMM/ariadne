@@ -27,7 +27,7 @@ def export_thumbnails_when_complete(run):
 
     uid = run.metadata["start"]["uid"]
     directory = os.path.join(tempfile.gettempdir(), "ariadne", uid)
-    os.makedirs(directory, exist_ok=True):
+    os.makedirs(directory, exist_ok=True)
 
     # If the Run is already done by the time we got it, export now.
     # Otherwise, schedule it to export whenever it finishes.

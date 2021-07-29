@@ -6,8 +6,7 @@ class AutoBMMPlot(AutoPlotter):
 
     def handle_new_stream(self, run, stream_name):
         if stream_name == 'primary':
-            plan_name = run.metadata.get('plan_name').replace(' ', '_')
-
+            plan_name = run.metadata['start'].get('plan_name').replace(' ', '_')
             # Check if plotting has been configured for this plan_name.
             # If there is no plotting configured, do nothing.
             if hasattr(self, plan_name):
@@ -20,7 +19,7 @@ class AutoBMMPlot(AutoPlotter):
 
     def rel_scan_linescan_xafs_y_lt(self, run, stream_name):
         # FIXME: Need to sort out how to get the correct motor here
-        x_values = run.metadata['start']['motors'][1]
+        x_values = 'xafs_y'
         models = []
         figures = []
 
