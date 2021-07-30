@@ -17,20 +17,19 @@ class AutoBMMPlot(AutoPlotter):
                 self.figures.extend(figures)
 
     def rel_scan_linescan_xafs_y_it(self, run, stream_name):
-        # FIXME: Need to sort out how to get the correct motor here
         x_values = 'xafs_y'
         models = []
         figures = []
 
         axes1 = Axes()
-        figure1 = Figure((axes1,), title="It_divided_by_I0")
+        figure1 = Figure((axes1,), title="rel_scan linescan xafs_y It")
         figures.append(figure1)
         models.append(
             Lines(x=x_values, ys=['It/I0',], max_runs=1, axes=axes1)
         )
 
         axes2 = Axes()
-        figure2 = Figure((axes2,), title="I0")
+        figure2 = Figure((axes2,), title="rel_scan linescan xafs_y It")
         figures.append(figure2)
         models.append(
             Lines(x=x_values, ys=['I0',],    max_runs=1, axes=axes2)
@@ -39,29 +38,36 @@ class AutoBMMPlot(AutoPlotter):
         return models, figures
 
     def rel_scan_linescan_xafs_pitch_it(self, run, stream_name):
-        x_values = run.metadata['start']['motors'][0]
+        x_values = 'xafs_pitch'
         models = []
         figures = []
 
-        axes = Axes()
-        figure = Figure((axes,), title="I0")
-        figures.append(figure)
+        axes1 = Axes()
+        figure1 = Figure((axes1,), title="rel_scan linescan xafs_pitch It")
+        figures.append(figure1)
         models.append(
-            Lines(x=x_values, ys=['I0',],    max_runs=1, axes=axes)
+            Lines(x=x_values, ys=['It/I0',], max_runs=1, axes=axes1)
+        )
+
+        axes2 = Axes()
+        figure2 = Figure((axes2,), title="rel_scan linescan xafs_pitch It")
+        figures.append(figure2)
+        models.append(
+            Lines(x=x_values, ys=['I0',],    max_runs=1, axes=axes2)
         )
 
         return models, figures
 
     def rel_scan_linescane_xafs_y_if(self, run, stream_name):
-        x_values = run.metadata['start']['motors'][0]
+        x_values = 'xafs_y'
         models = []
         figures = []
 
         axes = Axes()
-        figure = Figure((axes,), title="I0")
+        figure = Figure((axes,), title="rel_scan linescan xafs_y if")
         figures.append(figure)
         models.append(
-            Lines(x=x_values, ys=['I0',],    max_runs=1, axes=axes)
+            Lines(x=x_values, ys=['(Pt1+Pt2+Pt3+Pt4)/I0',],    max_runs=1, axes=axes)
         )
 
         return models, figures
@@ -73,7 +79,7 @@ class AutoBMMPlot(AutoPlotter):
 
         axes1 = Axes()
         axes2 = Axes()
-        figure = Figure((axes1, axes2), title='It and I0')
+        figure = Figure((axes1, axes2), title='scan_nd xafs transmission')
         figures.append(figure)
         models.append(
             Lines(x=x_values, ys=['It/I0',], max_runs=1, axes=axes1)
@@ -91,7 +97,7 @@ class AutoBMMPlot(AutoPlotter):
 
         axes1 = Axes()
         axes2 = Axes()
-        figure = Figure((axes1, axes2), title='It and I0')
+        figure = Figure((axes1, axes2), title='scan_nd xafs fluorescense')
         figures.append(figure)
         models.append(
             Lines(x=x_values, ys=['It/I0',], max_runs=1, axes=axes1)
