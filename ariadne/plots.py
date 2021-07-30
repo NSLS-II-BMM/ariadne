@@ -39,15 +39,16 @@ class AutoBMMPlot(AutoPlotter):
                                  'log(It/Ir)', 'I0', 'It/I0', 'Ir/It'],
                'ref': ['log(It/Ir)', 'It/I0', 'Ir/It']}
 
+            breakpoint()
             for y_axis in plot_lookup[subtype]:
                 subtitle = y_axis.replace('/','div')
-                model, figure = single_plot(f'{plan_name}: {subtitle}', x_axis, y_axis)
+                model, figure = self.single_plot(f'{plan_name}: {subtitle}', x_axis, y_axis)
                 model.add_run(run)
                 self.plot_builders.append(model)
                 self.figures.append(figure)
 
     def single_plot(self, title, x, y):
         axes1 = Axes()
-        figures = [Figure((axes1,), title=title)]
-        models = [Lines(x=x, ys=[y,], max_runs=1, axes=axes1)]
-        return models, figures
+        figure = Figure((axes1,), title=title)
+        model = Lines(x=x, ys=[y,], max_runs=1, axes=axes1)
+        return model, figure
