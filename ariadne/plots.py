@@ -1,10 +1,20 @@
 from bluesky_widgets.models.auto_plot_builders import AutoPlotter
 from bluesky_widgets.models.plot_builders import Lines
 from bluesky_widgets.models.plot_specs import Axes, Figure
+from .kafka_previews import export_thumbnails_when_complete, export_thumbnails_streaming
+from bluesky_widgets.utils.streaming import stream_documents_into_runs
 
 # plan_name
 # underlying_plan linescan motor type
 # underlying_plan xafs trans/fluorescence/ref
+
+def auto_plot(catalog, uid, fill='yes', streaming=False)
+    if streaming:
+        plotter = stream_documents_into_runs(export_thumbnails_streaming)
+    else:
+        plotter = stream_documents_into_runs(export_thumbnails_when_complete)
+    for name, doc in catalog[uid].canonical(fill=fill):
+        plotter(name, doc)
 
 
 class AutoBMMPlot(AutoPlotter):

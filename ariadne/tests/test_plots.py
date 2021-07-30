@@ -30,7 +30,7 @@ def test_from_config(catalog):
         ("ac694ff6-2444-49af-8898-bfa23d99c28c", ["scan_nd xafs transmission"]),
     ]
 )
-def test_export_(catalog, uid, titles):
+def test_plots(catalog, uid, titles):
     plotter = stream_documents_into_runs(export_thumbnails_when_complete)
 
     for name, doc in catalog[uid].canonical(fill='no'):

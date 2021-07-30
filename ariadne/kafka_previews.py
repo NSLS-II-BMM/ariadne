@@ -43,7 +43,7 @@ def export_thumbnails_when_complete(run):
         export()
 
 
-def export_thumbnails_while_live(run):
+def export_thumbnails_streaming(run):
     "Given a BlueskyRun, export thumbnail(s) to a directory while it updates."
     model = AutoBMMPlot()
     model.add_run(run)
