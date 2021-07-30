@@ -34,13 +34,13 @@ class AutoBMMPlot(AutoPlotter):
 
         # Look up what goes on the y-axis.
         y_lookup = {'I0': ['I0'],
-                       'It': ['It/I0'],
-                       'Ir': ['Ir/It'],
-                       'If': [f'({fluorescence})/I0'],
-                       'trans': ['log(I0/It)', 'log(It/Ir)', 'I0', 'It/I0', 'Ir/It'],
-                       'fluorescence': [f'({fluorescence})/I0', 'log(I0/It)',
-                                       'log(It/Ir)', 'I0', 'It/I0', 'Ir/It'],
-                       'ref': ['log(It/Ir)', 'It/I0', 'Ir/It']}
+                    'It': ['It/I0'],
+                    'Ir': ['Ir/It'],
+                    'If': [f'({fluorescence})/I0'],
+                    'trans': ['log(I0/It)', 'log(It/Ir)', 'I0', 'It/I0', 'Ir/It'],
+                    'fluorescence': [f'({fluorescence})/I0', 'log(I0/It)',
+                                     'log(It/Ir)', 'I0', 'It/I0', 'Ir/It'],
+                    'ref': ['log(It/Ir)', 'It/I0', 'Ir/It']}
         y_axes = y_lookup[subtype]
 
         for y_axis in y_axes:
