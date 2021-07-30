@@ -16,7 +16,7 @@ class AutoBMMPlot(AutoPlotter):
         # Find out the plan type.
         plan_name = run.metadata['start'].get('plan_name').split(' ')
         if len(plan_name) > 1:
-            plan = plan_name[1] # xafs or linescan
+            plan = plan_name[1]
 
         # Skip plan if it is not supported.
         if plan not in ['xafs', 'linescan']:
