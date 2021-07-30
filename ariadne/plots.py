@@ -22,14 +22,14 @@ class AutoBMMPlot(AutoPlotter):
         figures = []
 
         axes1 = Axes()
-        figure1 = Figure((axes1,), title="rel_scan linescan xafs_y It")
+        figure1 = Figure((axes1,), title="rel_scan linescan xafs_y It: It_div_I0")
         figures.append(figure1)
         models.append(
             Lines(x=x_values, ys=['It/I0',], max_runs=1, axes=axes1)
         )
 
         axes2 = Axes()
-        figure2 = Figure((axes2,), title="rel_scan linescan xafs_y It")
+        figure2 = Figure((axes2,), title="rel_scan linescan xafs_y It: I0")
         figures.append(figure2)
         models.append(
             Lines(x=x_values, ys=['I0',],    max_runs=1, axes=axes2)
@@ -43,14 +43,14 @@ class AutoBMMPlot(AutoPlotter):
         figures = []
 
         axes1 = Axes()
-        figure1 = Figure((axes1,), title="rel_scan linescan xafs_pitch It")
+        figure1 = Figure((axes1,), title="rel_scan linescan xafs_pitch It: It_div_I0")
         figures.append(figure1)
         models.append(
             Lines(x=x_values, ys=['It/I0',], max_runs=1, axes=axes1)
         )
 
         axes2 = Axes()
-        figure2 = Figure((axes2,), title="rel_scan linescan xafs_pitch It")
+        figure2 = Figure((axes2,), title="rel_scan linescan xafs_pitch It: I0")
         figures.append(figure2)
         models.append(
             Lines(x=x_values, ys=['I0',],    max_runs=1, axes=axes2)
@@ -64,7 +64,7 @@ class AutoBMMPlot(AutoPlotter):
         figures = []
 
         axes = Axes()
-        figure = Figure((axes,), title="rel_scan linescan xafs_y if")
+        figure = Figure((axes,), title="rel_scan linescan xafs_y if: Fluor_div_I0")
         figures.append(figure)
         models.append(
             Lines(x=x_values, ys=['(Pt1+Pt2+Pt3+Pt4)/I0',],    max_runs=1, axes=axes)
