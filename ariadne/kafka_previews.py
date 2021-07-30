@@ -19,6 +19,15 @@ from bluesky_widgets.models.utils import run_is_live_and_not_completed
 from .plots import AutoBMMPlot
 
 
+def auto_plot(catalog, uid, fill='yes', streaming=False):
+    if streaming:
+        plotter = stream_documents_into_runs(export_thumbnails_streaming)
+    else:
+        plotter = stream_documents_into_runs(export_thumbnails_when_complete)
+    for name, doc in catalog[uid].canonical(fill=fill):
+        plotter(name, doc)
+
+
 def export_thumbnails_when_complete(run):
     "Given a BlueskyRun, export thumbnail(s) to a directory when it completes."
     model = AutoBMMPlot()
