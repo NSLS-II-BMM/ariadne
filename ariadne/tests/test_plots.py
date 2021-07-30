@@ -25,10 +25,8 @@ def test_from_config(catalog):
 @pytest.mark.parametrize(
     "uid,titles",
     [
-        ("1dccff46-2576-4da2-8971-4de1ee4e98b7", ["rel_scan linescan xafs_y It: It_div_I0",
-                                                  "rel_scan linescan xafs_y It: I0"]),
-        ("d748dbdc-cec4-4211-b626-801f1799cb56", ["rel_scan linescan xafs_pitch It: It_div_I0",
-                                                  "rel_scan linescan xafs_pitch It: I0"]),
+        ("1dccff46-2576-4da2-8971-4de1ee4e98b7", ["rel_scan linescan xafs_y It: It_div_I0"]),
+        ("d748dbdc-cec4-4211-b626-801f1799cb56", ["rel_scan linescan xafs_pitch It: It_div_I0"]),
         ("ac694ff6-2444-49af-8898-bfa23d99c28c", ["scan_nd xafs transmission"]),
     ]
 )
@@ -42,4 +40,6 @@ def test_export_(catalog, uid, titles):
         plot_file = os.path.join(tempfile.gettempdir(),"ariadne",
                                  uid, f"{title}.png")
         assert Path(plot_file).exists()
-        os.remove(plot_file)
+
+        # Might need to remove the plots after the test.
+        # os.remove(plot_file)
