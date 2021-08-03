@@ -9,6 +9,19 @@ from bluesky_widgets.models.plot_specs import Axes, Figure
 
 class AutoBMMPlot(AutoPlotter):
 
+    def __init__(self):
+        super().__init__()
+        self._models = {}
+
+        self.plot_builders.events.removed.connect(self._on_plot_builder_removed)
+
+    def _on_plot_builder_removed(self, event):
+        plot_builder = event.item
+        for key in list(self._models):
+            for line in self._models[key]:
+                if line == plot_builder:
+                    del self._models[key]
+
     def handle_new_stream(self, run, stream_name):
         if stream_name != 'primary':
             return
@@ -45,14 +58,20 @@ class AutoBMMPlot(AutoPlotter):
 
         for y_axis in y_axes:
             title = ' '.join(plan_name)
-            subtitle = y_axis.replace('/','_div_')
-            model, figure = self.single_plot(f'{title}: {subtitle}', x_axis, y_axis)
+            subtitle = y_axis
+
+            # The `key` identifies what should be over-plotted.
+            key = (y_axis, x_axis, plan_name)
+            try:
+                self._models[key]
+            except KeyError:
+                axes1 = Axes()
+                figure = Figure((axes1,), title=f'{title}: {subtitle}')
+                model = Lines(x=x_axis, ys=[y_axis], max_runs=10, axes=axes1)
+                self._models[key] = model
             model.add_run(run)
             self.plot_builders.append(model)
             self.figures.append(figure)
+            self._models
 
-    def single_plot(self, title, x, y):
-        axes1 = Axes()
-        figure = Figure((axes1,), title=title)
-        model = Lines(x=x, ys=[y,], max_runs=1, axes=axes1)
         return model, figure
