@@ -64,7 +64,7 @@ class AutoBMMPlot(AutoPlotter):
                 models = self._models[key]
             else:
                 model, figure = self.single_plot(f'{title}: {subtitle}',x_axis, y_axis)
-                self._models[key].append(model)
+                self._models[key] = model
 
         for model in models:
             model.add_run(run)
@@ -76,5 +76,5 @@ class AutoBMMPlot(AutoPlotter):
     def single_plot(self, title, x, y):
         axes1 = Axes()
         figure = Figure((axes1,), title=title)
-        model = Lines(x=x, ys=[y,], max_runs=1, axes=axes1)
+        model = Lines(x=x, ys=[y,], max_runs=10, axes=axes1)
         return model, figure
