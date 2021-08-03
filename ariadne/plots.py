@@ -67,7 +67,7 @@ class AutoBMMPlot(AutoPlotter):
                 models = [model]
                 self._models[key] = model
 
-        for model in models:
+        for model in self._models:
             model.add_run(run)
             self.plot_builders.append(model)
             self.figures.append(figure)
