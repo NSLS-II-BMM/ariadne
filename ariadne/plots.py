@@ -56,17 +56,15 @@ class AutoBMMPlot(AutoPlotter):
                     'ref': ['log(It/Ir)', 'It/I0', 'Ir/It']}
         y_axes = y_lookup[subtype]
 
-        models = []
         for y_axis in y_axes:
             title = ' '.join(plan_name)
             subtitle = y_axis
-
-            if title in self._models:
-                models = self._models[title]
+            key = f'{title}: {subtitle}'
+            if key in self._models:
+                models = self._models[key]
             else:
                 model, figure = self.single_plot(f'{title}: {subtitle}',x_axis, y_axis)
-                models.append(model)
-                self._models[title] = models
+                self._models[key].append(model)
 
         for model in models:
             model.add_run(run)
