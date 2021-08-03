@@ -58,12 +58,12 @@ class AutoBMMPlot(AutoPlotter):
 
         for y_axis in y_axes:
             # The `key` identifies what should be over-plotted.
-            key = (y_axis, x_axis, plan_name)
+            title = ' '.join(plan_name)
+            key = (y_axis, x_axis, title)
             try:
                 models = self._models[key]
             except KeyError:
                 axes1 = Axes()
-                title = ' '.join(plan_name)
                 subtitle = y_axis
                 figure = Figure((axes1,), title=f'{title}: {subtitle}')
                 model = Lines(x=x_axis, ys=[y_axis], max_runs=10, axes=axes1)
