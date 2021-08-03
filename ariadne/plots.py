@@ -57,21 +57,21 @@ class AutoBMMPlot(AutoPlotter):
         y_axes = y_lookup[subtype]
 
         for y_axis in y_axes:
-            title = ' '.join(plan_name)
-            subtitle = y_axis
-
             # The `key` identifies what should be over-plotted.
             key = (y_axis, x_axis, plan_name)
             try:
-                self._models[key]
+                models = self._models[key]
             except KeyError:
                 axes1 = Axes()
+                title = ' '.join(plan_name)
+                subtitle = y_axis
                 figure = Figure((axes1,), title=f'{title}: {subtitle}')
                 model = Lines(x=x_axis, ys=[y_axis], max_runs=10, axes=axes1)
-                self._models[key] = model
-            model.add_run(run)
-            self.plot_builders.append(model)
-            self.figures.append(figure)
-            self._models
+                models = [model]
+                self._models[key] = models
+            for model in models:
+                model.add_run(run)
+                self.plot_builders.append(model)
+                self.figures.append(figure)
 
         return model, figure
