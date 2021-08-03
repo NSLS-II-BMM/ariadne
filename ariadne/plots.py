@@ -61,7 +61,7 @@ class AutoBMMPlot(AutoPlotter):
             title = ' '.join(plan_name)
             subtitle = y_axis
 
-            if title in models:
+            if title in self._models:
                 models = self._models[title]
             else:
                 model, figure = self.single_plot(f'{title}: {subtitle}',x_axis, y_axis)
