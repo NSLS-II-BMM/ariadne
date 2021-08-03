@@ -56,7 +56,6 @@ class AutoBMMPlot(AutoPlotter):
                     'ref': ['log(It/Ir)', 'It/I0', 'Ir/It']}
         y_axes = y_lookup[subtype]
 
-        # Ma
         for y_axis in y_axes:
             title = ' '.join(plan_name)
             subtitle = y_axis
@@ -75,8 +74,8 @@ class AutoBMMPlot(AutoPlotter):
 
         return model, figure
 
-        def single_plot(self, title, x, y):
-            axes1 = Axes()
-            figure = Figure((axes1,), title=title)
-            model = Lines(x=x, ys=[y,], max_runs=1, axes=axes1)
-            return model, figure
+    def single_plot(self, title, x, y):
+        axes1 = Axes()
+        figure = Figure((axes1,), title=title)
+        model = Lines(x=x, ys=[y,], max_runs=1, axes=axes1)
+        return model, figure
