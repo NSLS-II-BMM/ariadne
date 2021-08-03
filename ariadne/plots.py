@@ -37,7 +37,7 @@ class AutoBMMPlot(AutoPlotter):
 
         # Gather the rest of the parameters.
         subtype = plan_name[-1] # trans, ref, fluorescence, I0, It, Ir
-        element = run.metadata['start'].get('XDI', {}).get('Element',{}).get('Symbol', False)
+        element = run.metadata['start'].get('XDI', {}).get('Element',{}).get('symbol', False)
         fluorescence = f'{element}1+{element}2+{element}3+{element}4' if element else None
 
         # Look up what goes on the x-axis.
@@ -56,22 +56,27 @@ class AutoBMMPlot(AutoPlotter):
                     'ref': ['log(It/Ir)', 'It/I0', 'Ir/It']}
         y_axes = y_lookup[subtype]
 
+        # Ma
         for y_axis in y_axes:
-            # The `key` identifies what should be over-plotted.
             title = ' '.join(plan_name)
-            key = (y_axis, x_axis, title)
-            try:
-                models = self._models[key]
-            except KeyError:
-                axes1 = Axes()
-                subtitle = y_axis
-                figure = Figure((axes1,), title=f'{title}: {subtitle}')
-                model = Lines(x=x_axis, ys=[y_axis], max_runs=10, axes=axes1)
+            subtitle = y_axis
+
+            if title in models:
+                models = self._models[title]
+            else:
+                model, figure = self.single_plot(f'{title}: {subtitle}',x_axis, y_axis)
                 models = [model]
-                self._models[key] = models
+                self._models[title] = models
+
             for model in models:
                 model.add_run(run)
                 self.plot_builders.append(model)
                 self.figures.append(figure)
 
         return model, figure
+
+        def single_plot(self, title, x, y):
+            axes1 = Axes()
+            figure = Figure((axes1,), title=title)
+            model = Lines(x=x, ys=[y,], max_runs=1, axes=axes1)
+            return model, figure
