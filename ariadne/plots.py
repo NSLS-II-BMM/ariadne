@@ -62,10 +62,11 @@ class AutoBMMPlot(AutoPlotter):
             key = f'{title}: {subtitle}'
             if key in self._models:
                 models = self._models[key]
+                figure = Figure((Axes(),), title=key)
             else:
                 model, figure = self.single_plot(f'{title}: {subtitle}',x_axis, y_axis)
                 models = [model]
-                self._models[key] = model
+                self._models[key] = [model]
 
             for model in models:
                 model.add_run(run)
