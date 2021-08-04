@@ -50,6 +50,10 @@ setup(
             "ariadne = ariadne.main:main"
             # 'command = some.module:some_function',
         ],
+        "databroker.handlers": [
+            "BMM_ANALOG_CAMERA = ariadne.handlers:BMM_JPEG_HANDLER",
+            "BMM_XAS_WEBCAM = ariadne.handlers:BMM_JPEG_HANDLER",
+        ],
     },
     include_package_data=True,
     package_data={
